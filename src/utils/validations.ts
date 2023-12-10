@@ -1,3 +1,5 @@
+import { capitalize } from "./transformations";
+
 export function isEmailValid(emailAddress: string) {
   // eslint-disable-next-line no-useless-escape
   const regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -17,11 +19,7 @@ export const isValidCity = (
   submittedCity: string,
   cityRepository: string[]
 ): boolean => {
-  cityRepository.includes(submittedCity) ? true : false;
-
-  if (cityRepository.includes(submittedCity)) {
-    return true;
-  } else return false;
+  return cityRepository.includes(capitalize(submittedCity)) ? true : false;
 };
 
 export const isNameValid = (chosenName: string): boolean => {

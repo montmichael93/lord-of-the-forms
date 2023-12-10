@@ -9,7 +9,7 @@ import {
 import { allCities } from "../utils/all-cities";
 import { TextInput } from "./ClassTextInput";
 import { PhoneInput } from "./CLassPhoneInput";
-import { FormPropsTypes, PhoneInputState } from "../types";
+import { PhoneInputState, UserInformation } from "../types";
 const firstNameErrorMessage =
   "First Name should be at least 2 characters long and should not contain non letters.";
 const lastNameErrorMessage =
@@ -26,6 +26,10 @@ interface ClassComponentStates {
   userPhoneNumberInput: PhoneInputState;
   isFormSubmitted: boolean;
 }
+
+type FormPropsTypes = {
+  handleSubmitUser: (input: UserInformation) => void;
+};
 
 export class ClassForm extends Component<FormPropsTypes> {
   state: ClassComponentStates = {
@@ -44,20 +48,12 @@ export class ClassForm extends Component<FormPropsTypes> {
   };
 
   render() {
-    const {
-      handleUserFirstNameInput,
-      handleUserLastNameInput,
-      handleUserEmailInput,
-      handleUserCityInput,
-      handleUserPhoneNumberInput,
-    } = this.props;
-
     const isFirstNameInputValid = isNameValid(this.state.firstNameInput);
-    const shouldShowfirstNameErrorMessage =
+    const shouldShowFirstNameErrorMessage =
       this.state.isFormSubmitted && !isFirstNameInputValid;
 
     const isLastNameInputValid = isNameValid(this.state.lastNameInput);
-    const shouldShowlastNameErrorMessage =
+    const shouldShowLastNameErrorMessage =
       this.state.isFormSubmitted && !isLastNameInputValid;
 
     const isEmailInputValid = isEmailValid(this.state.emailInput);
@@ -73,31 +69,39 @@ export class ClassForm extends Component<FormPropsTypes> {
     const shouldShowPhoneErrorMessage =
       this.state.isFormSubmitted && !isPhoneInputValid;
 
+    const reset = () => {
+      this.setState({ firstNameInput: "" });
+      this.setState({ lastNameInput: "" });
+      this.setState({ emailInput: "" });
+      this.setState({ cityInput: "" });
+      this.setState({ userPhoneNumberInput: ["", "", "", ""] });
+      this.setState({ isFormSubmitted: false });
+    };
+
     const handleSubmit = (e: FormEvent) => {
       e.preventDefault();
       this.setState({ isFormSubmitted: true });
 
       if (
-        isNameValid(this.state.firstNameInput) &&
-        isNameValid(this.state.lastNameInput) &&
-        isEmailValid(this.state.emailInput) &&
-        isValidCity(this.state.cityInput, allCities) &&
-        isPhoneNumberValid(this.state.userPhoneNumberInput)
+        !(
+          isNameValid(this.state.firstNameInput) &&
+          isNameValid(this.state.lastNameInput) &&
+          isEmailValid(this.state.emailInput) &&
+          isValidCity(this.state.cityInput, allCities) &&
+          isPhoneNumberValid(this.state.userPhoneNumberInput)
+        )
       ) {
-        handleUserFirstNameInput(this.state.firstNameInput);
-        handleUserLastNameInput(this.state.lastNameInput);
-        handleUserEmailInput(this.state.emailInput);
-        handleUserCityInput(this.state.cityInput);
-        handleUserPhoneNumberInput(this.state.userPhoneNumberInput);
-        this.setState({ firstNameInput: "" });
-        this.setState({ lastNameInput: "" });
-        this.setState({ emailInput: "" });
-        this.setState({ cityInput: "" });
-        this.setState({ userPhoneNumberInput: ["", "", "", ""] });
-        this.setState({ isFormSubmitted: false });
-      } else {
         alert("Bad Inputs");
+        return;
       }
+      this.props.handleSubmitUser({
+        city: this.state.cityInput,
+        email: this.state.emailInput,
+        firstName: this.state.firstNameInput,
+        lastName: this.state.lastNameInput,
+        phone: this.state.userPhoneNumberInput.join(" "),
+      });
+      reset();
     };
 
     return (
@@ -117,7 +121,7 @@ export class ClassForm extends Component<FormPropsTypes> {
           labelText={"First Name"}
         />
 
-        {shouldShowfirstNameErrorMessage && (
+        {shouldShowFirstNameErrorMessage && (
           <ErrorMessage message={firstNameErrorMessage} show={true} />
         )}
 
@@ -134,7 +138,7 @@ export class ClassForm extends Component<FormPropsTypes> {
           labelText={"Last Name"}
         />
 
-        {shouldShowlastNameErrorMessage && (
+        {shouldShowLastNameErrorMessage && (
           <ErrorMessage message={lastNameErrorMessage} show={true} />
         )}
 

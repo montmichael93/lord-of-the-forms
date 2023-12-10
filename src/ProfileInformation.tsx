@@ -19,7 +19,7 @@ export const ProfileInformation = ({
   function isObjectValuesEmpty(userObject: UserInformation) {
     return Object.values(userObject).every((value) => value === "");
   }
-  if (userData && isObjectValuesEmpty(userData)) {
+  if (!userData || isObjectValuesEmpty(userData)) {
     return (
       <>
         <u>
